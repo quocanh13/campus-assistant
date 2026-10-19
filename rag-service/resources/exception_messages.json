@@ -1,0 +1,7 @@
+{
+    "business" : {
+    },
+    "server" : {
+        "SERVER_ERROR" : { "status_code": 500, "message": "Server error, try again."}
+    }
+}

@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pymupdf
+dotenv
+weaviate-client
+google-genai
+boto3
+python-docx
+pyyaml

@@ -1,0 +1,31 @@
+weaviate:
+  collection: campus_policy
+
+ingestion:
+  chunk_size: 512
+  enricher_model: "gemini-3.1-flash-lite"
+  enrich_max_try: 3
+
+query_processing: 
+    model: "gemini-3.1-flash-lite"
+
+retrieval:
+    chunk_limit: 5
+    adj_limit: 1
+    
+generation:
+    model: "gemini-3.1-flash-lite"  
+
+
+s3:
+  bucket: campus-policy
+
+fast_api:
+  title: "Campus Policy"
+  description: "RAG system for campus policy lookup"
+  version: 0.0.0
+
+logging:
+  level: DEBUG
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  filename: app.log
