@@ -1,6 +1,6 @@
 FROM python:3.11
 
-WORKDIR "campus-policy-rag/rag-service"
+WORKDIR "campus-assistant/rag-service"
 
 COPY ./requirement.txt ./
 COPY ./start.sh ./
