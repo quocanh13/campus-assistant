@@ -1,0 +1,7 @@
+langchain
+fastapi
+pyyaml
+dotenv
+langchain-google-genai
+langgraph
+pydantic
