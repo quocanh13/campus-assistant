@@ -13,10 +13,13 @@ class IngestDocumentRequest(BaseModel):
 
 class QueryRequest(BaseModel):
     query: str
+    
+class RetrieveRequest(BaseModel):
+    query: str
 
 class BaseResponse(BaseModel):
     code: str
-    message: str
+    message: str | None = None
     detail: list[dict] | None = None
     data: Any = None
     
@@ -34,7 +37,7 @@ class BaseResponse(BaseModel):
     
     @staticmethod
     def success(
-        message: str,
+        message: str | None = None,
         data: Any = None
     ) -> "BaseResponse":
         return BaseResponse(

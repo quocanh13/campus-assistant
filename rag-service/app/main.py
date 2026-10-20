@@ -1,6 +1,6 @@
 import uvicorn
 import logging
-from config import app_config
+from app.config import app_config
 
 def main():
     logging_config = app_config.logging_config
@@ -12,7 +12,7 @@ def main():
     )
     
     uvicorn.run(
-        app="server.app:app",
+        app="app.server:app",
         host=fast_api_config.host,
         port=fast_api_config.port,
         reload=True
