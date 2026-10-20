@@ -1,5 +1,5 @@
 from langchain.agents import create_agent
-from tools.rag_tools import search_documents
+from tool.rag import search_documents
 from langgraph.checkpoint.memory import InMemorySaver
 
 def build_agent(model: str):
