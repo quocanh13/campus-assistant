@@ -1,0 +1,5 @@
+server:
+  SERVER_ERROR: 
+    status_code: 500
+    message: "Server error"
+business:
