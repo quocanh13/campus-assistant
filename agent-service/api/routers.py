@@ -1,20 +1,17 @@
 from fastapi import APIRouter
-from api.schemas import PostChatRequest
-from app.dependency import agent
-from agents.config import get_chat_config
+from api.schemas import *
+from api.dependency import *
 
 router = APIRouter()
 
 @router.post("/chat/{chat_id}")
 def post_chat(chat_id: str, request: PostChatRequest):
-    chat_config = get_chat_config(chat_id=chat_id)
-    result = agent.invoke(
-        {
-            "messages" : [
-                {"role": "user", "content": request.message}
-            ]
-        },
-        config=chat_config
+    data = chat_service.chat(
+        chat_id=chat_id,
+        request=request
     )
-    return result["messages"][-1].content
+    response = BaseResponse.success(
+        data=data
+    )
+    return response.model_dump(exclude_none=True)
     
