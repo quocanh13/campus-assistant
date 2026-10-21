@@ -1,0 +1,41 @@
+2026-10-08T00:32:18.757Z  INFO 266 --- [restartedMain] com.example.backend.BackendApplication   : Starting BackendApplication using Java 22.0.2 with PID 266 (/campus-policy-rag/backend/target/classes started by root in /campus-policy-rag/backend)
+2026-10-08T00:32:18.827Z  INFO 266 --- [restartedMain] com.example.backend.BackendApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-10-08T00:32:19.725Z  INFO 266 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-10-08T00:32:19.727Z  INFO 266 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-10-08T00:32:36.475Z  INFO 266 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-08T00:32:38.847Z  INFO 266 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2243 ms. Found 2 JPA repository interfaces.
+2026-10-08T00:32:49.215Z  INFO 266 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-10-08T00:32:49.375Z  INFO 266 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-08T00:32:49.377Z  INFO 266 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.55]
+2026-10-08T00:32:49.740Z  INFO 266 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-10-08T00:32:49.742Z  INFO 266 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 30009 ms
+2026-10-08T00:32:53.809Z  INFO 266 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-08T00:32:55.453Z  INFO 266 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.53.Final
+2026-10-08T00:32:56.226Z  INFO 266 --- [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-08T00:33:02.610Z  INFO 266 --- [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-08T00:33:03.366Z  INFO 266 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-08T00:33:06.645Z  INFO 266 --- [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@602c700b
+2026-10-08T00:33:06.681Z  INFO 266 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-08T00:33:07.930Z  INFO 266 --- [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.4.11
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-08T00:33:23.903Z  INFO 266 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-08T00:33:24.595Z  INFO 266 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-08T00:33:39.176Z  WARN 266 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-10-08T00:33:40.698Z  WARN 266 --- [restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 62cd7257-a643-4bd8-833f-be2c29df41ef
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-10-08T00:33:40.824Z  INFO 266 --- [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-10-08T00:33:53.864Z  INFO 266 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-10-08T00:33:54.044Z  INFO 266 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-10-08T00:33:54.071Z  INFO 266 --- [restartedMain] com.example.backend.BackendApplication   : Started BackendApplication in 102.255 seconds (process running for 106.063)
+2026-10-08T01:02:06.115Z  INFO 266 --- [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-08T01:02:06.133Z  INFO 266 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
