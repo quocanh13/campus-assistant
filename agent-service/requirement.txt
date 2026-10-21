@@ -5,3 +5,5 @@ dotenv
 langchain-google-genai
 langgraph
 pydantic
+uvicorn
+requests
