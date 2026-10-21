@@ -1,7 +1,7 @@
 import logging
 import argparse
 import weaviate
-from config import app_config
+from app.config import app_config
 from rag.dependency.database import weaviate_db
 from weaviate.classes.config import Configure, Property, DataType
 
@@ -31,20 +31,15 @@ def init_weaviate():
         properties=[
             Property(name="file_id", data_type=DataType.UUID),
             Property(name="content", data_type=DataType.TEXT),
-            Property(name="chunk_index", data_type=DataType.INT),
-            Property(name="date", data_type=DataType.DATE),
-            Property(name="document_type", data_type=DataType.TEXT),
-            Property(name="cohort", data_type=DataType.INT),
-            Property(name="keyword", data_type=DataType.TEXT)
+            Property(name="chunk_index", data_type=DataType.INT)
         ]
     )
     logger.info("Init weaviate successfully")
     client.close()
 
-# def delete_all_document():
-#     weaviate_db.delete_all()
+def delete_all_document():
+    weaviate_db.delete_all()
 
-# delete_all_document()
-
+delete_all_document()
 init_weaviate()
 

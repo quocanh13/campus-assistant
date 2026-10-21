@@ -1,8 +1,8 @@
 import logging
 from fastapi import FastAPI
 from app.config import app_config
-from app.routes import router
-from app.exception_handler import *
+from api.routes import router
+from api.exception_handler import *
 
 _logger = logging.getLogger(__name__)
 fast_api_config = app_config.fast_api_config

@@ -1,4 +1,4 @@
-from config import app_config
+from app.config import app_config
 from rag.ingestion.enrichment import Enricher
 
 ingestion_config = app_config.ingestion_config

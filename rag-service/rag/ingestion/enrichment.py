@@ -2,7 +2,7 @@ import json
 import logging
 from datetime import datetime
 from google import genai
-from server.exception import BusinessException, BusinessExceptionCode
+from api.exception import BusinessException, BusinessExceptionCode
 
 _SYSTEM_INSTRUCTION="""
 Hãy đọc file được đính kèm, dựa trên tên file và nội dung trả về metadata của file đó cho tôi.

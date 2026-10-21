@@ -1,4 +1,4 @@
-from config import app_config
+from app.config import app_config
 from rag.query.generation import Generator
 from rag.query.query_processing import QueryProcessor
 from rag.query.retrieval import Retriever

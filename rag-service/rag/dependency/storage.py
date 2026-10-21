@@ -1,4 +1,4 @@
-from config import app_config
+from app.config import app_config
 from ..storage.s3_storage import S3
 
 _s3_config = app_config.s3_config
