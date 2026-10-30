@@ -27,11 +27,19 @@ def init_weaviate():
             return
     client.collections.create(
         name=weaviate_config.collection,
-        vector_config=Configure.Vectors.text2vec_weaviate(),
+        vector_config=Configure.Vectors.text2vec_weaviate(
+            name="content_vector",
+            source_properties=["content"]
+        ),
         properties=[
             Property(name="file_id", data_type=DataType.UUID),
             Property(name="content", data_type=DataType.TEXT),
-            Property(name="chunk_index", data_type=DataType.INT)
+            Property(name="chunk_index", data_type=DataType.INT),
+            Property(name="from_cohort", data_type=DataType.INT),
+            Property(name="to_cohort", data_type=DataType.INT),
+            Property(name="keywords", data_type=DataType.TEXT_ARRAY),
+            Property(name="valid_at", data_type=DataType.DATE),
+            Property(name="expired_at", data_type=DataType.DATE)
         ]
     )
     logger.info("Init weaviate successfully")

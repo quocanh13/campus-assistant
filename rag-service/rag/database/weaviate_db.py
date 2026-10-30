@@ -1,7 +1,7 @@
 import uuid
 import logging
 import weaviate
-from enum import Enum
+from datetime import datetime
 from weaviate.classes.query import Filter, MetadataQuery
 
 _logger = logging.getLogger(__name__)
@@ -32,35 +32,83 @@ class WeaviateDB:
         file_id: uuid.UUID,
         content: str,
         chunk_index: int,
-        document_type: str,
-        cohort: int,
-        keyword: str
+        from_cohort: int,
+        to_cohort: int,
+        keywords: list[str],
+        valid_at: datetime,
+        expired_at: datetime
     ) -> str:
         id = self.collection.data.insert(properties={
             "file_id" : file_id,
             "content" : content,
             "chunk_index" : chunk_index,
-            "document_type" : document_type,
-            "cohort" : cohort,
-            "keyword" : keyword
+            "from_cohort" : from_cohort,
+            "to_cohort" : to_cohort,
+            "keywords" : keywords,
+            "valid_at" : valid_at,
+            "expired_at" : expired_at
         })
         return id
 
-    def dense_search(self, query: str, limit: int):
+    @staticmethod
+    def create_filters(
+        cohort: int | None = None,
+        is_valid: bool = True
+    ):
+        current = datetime.now()
+        cohort_filter = (
+            Filter.by_property("from_cohort").less_or_equal(cohort) & 
+            Filter.by_property("to_cohort").greater_or_equal(cohort)
+        ) if cohort is not None else None
+        
+        valid_filter = (
+            Filter.by_property("valid_at").less_or_equal(current) &
+            Filter.by_property("expired_at").greater_or_equal(current)
+        ) if is_valid else None
+        
+        filters = None
+        if cohort_filter is not None and valid_filter is not None:
+            filters = cohort_filter & valid_filter
+        elif cohort_filter is not None:
+            filters = cohort_filter
+        elif valid_filter is not None:
+            filters = valid_filter
+        return filters
+
+    def dense_search(
+        self, 
+        query: str, 
+        limit: int,
+        cohort: int | None = None,
+        is_valid: bool = True
+    ):
+        filters = self.create_filters(cohort, is_valid)
         response = self.collection.query.near_text(
             query=query,
             limit=limit,
-            return_metadata=MetadataQuery(distance=True)
+            target_vector="content_vector",
+            filters=filters
         )
         return response.objects
 
-    def hybrid_search(self, metadata: dict, limit: int):
-        response = self.collection.query.hybrid(
+    def bm25_search(
+        self,
+        query: str,
+        limit: int,
+        cohort: int | None = None,
+        is_valid: bool = True
+    ):
+        if(query == ""):
+            return []
+        filters = self.create_filters(cohort, is_valid)
+        response = self.collection.query.bm25(
             query=query,
+            query_properties=["keywords"],
             limit=limit,
-            return_metadata=MetadataQuery(distance=True)
+            filters=filters
         )
-        
+        return response.objects
+   
     def find_by_chunk_index(
         self, 
         file_id: uuid.UUID, 

@@ -1,14 +1,66 @@
-from rag.query.retrieval import Retriever
+from uuid import UUID
+from rag.database.weaviate_db import WeaviateDB
+from rag.retrieval.retriever import Retriever
+from rag.retrieval.rrf import RRF
 
 class RetrivalPipeline:
     def __init__(
         self,
-        retriever: Retriever
+        retriever: Retriever,
+        weaviate_db: WeaviateDB,
+        rrf: RRF,
+        search_limit: int,
+        ranked_limit: int
     ):
         self._retriever = retriever
+        self._weaviate_db = weaviate_db
+        self._rrf = rrf
+        self._search_limit = search_limit
+        self._ranked_limit = ranked_limit
         
-    def retrieve(self, query: str) -> dict:
-        context, ids = self._retriever.retrieve(query)
+    def retrieve(
+        self, 
+        query: str,
+        cohort: int | None = None,
+        keywords: list[str] = [],
+        is_valid = True
+    ) -> dict:
+        
+        vector_chunks = self._weaviate_db.dense_search(
+            query=query,
+            limit=self._search_limit,
+            cohort=cohort,
+            is_valid=is_valid
+        )
+        bm25_chunks = self._weaviate_db.bm25_search(
+            query=" ".join(keywords),
+            limit=self._search_limit,
+            cohort=cohort,
+            is_valid=is_valid
+        )
+        
+        chunk_ranks: dict[UUID, list[int | None]] = {}
+        for rank, chunk in enumerate(vector_chunks):
+            value = chunk_ranks.get(chunk.uuid, [None, None])
+            value[0] = rank
+            chunk_ranks[chunk.uuid] = value
+        for rank, chunk in enumerate(bm25_chunks):
+            value = chunk_ranks.get(chunk.uuid, [None, None])
+            value[1] = rank
+            chunk_ranks[chunk.uuid] = value
+            
+        scores = self._rrf.rerank(chunk_ranks)
+        chunks_by_id = { chunk.uuid: chunk for chunk in [*vector_chunks, *bm25_chunks] }
+        reanked_chunks = []
+        for i in range(self._ranked_limit):
+            best_id = max(scores, key=scores.get)
+            reanked_chunks.append(chunks_by_id[best_id])
+            del scores[best_id]
+            
+        
+        context, ids = self._retriever.retrieve(
+            chunks=reanked_chunks
+        )
         result: dict = {}
         result["context"] = context
         result["related_document_ids"] = ids

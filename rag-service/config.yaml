@@ -10,8 +10,11 @@ query_processing:
     model: "gemini-3.1-flash-lite"
 
 retrieval:
-    chunk_limit: 5
+    search_limit: 5
+    ranked_limit: 3
     adj_limit: 1
+    K: 60
+    ratio: 0.5
     
 generation:
     model: "gemini-3.1-flash-lite"  

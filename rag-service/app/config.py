@@ -43,8 +43,11 @@ class QueryProcessingConfig:
     
 @dataclass(frozen=True)
 class RetrievalConfig:
-    chunk_limit: int = int(_config_dict["retrieval"]["chunk_limit"])
+    search_limit: int = int(_config_dict["retrieval"]["search_limit"])
+    ranked_limit: int = int(_config_dict["retrieval"]["ranked_limit"])
     adj_limit: int = int(_config_dict["retrieval"]["adj_limit"])
+    K: int = int(_config_dict["retrieval"]["K"])
+    ratio: float = float(_config_dict["retrieval"]["ratio"])
 
 @dataclass(frozen=True)
 class GenerationConfig:

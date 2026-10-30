@@ -1,24 +1,21 @@
 from uuid import UUID
 from rag.database.weaviate_db import WeaviateDB
 
-
 class Retriever:
     def __init__(
         self, 
         weaviate_db: WeaviateDB,
-        limit: int,
         adj_limit: int
     ):
-        self._limit = limit
         self._weaviate_db = weaviate_db
         self._adj_limit = adj_limit
 
 
-    def retrieve(self, processed_query: str) -> tuple[str, list[UUID]]:
-        chunks = self._weaviate_db.dense_search(
-            query=processed_query,
-            limit=self._limit
-        )
+    def retrieve(
+        self, 
+        chunks
+    ) -> tuple[str, list[UUID]]:
+    
         index_lists: dict[UUID, list[tuple[int, int]]] = {}
         for chunk in chunks:
             file_id = chunk.properties["file_id"]
