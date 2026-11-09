@@ -24,9 +24,9 @@ public class GetDocumentResponse{
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String mimeType;
 
-    @JsonProperty("file_size")
+    @JsonProperty("size")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long fileSize;
+    private Long size;
 
     @JsonProperty("user_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)

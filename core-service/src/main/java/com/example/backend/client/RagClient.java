@@ -1,7 +1,6 @@
 package com.example.backend.client;
 
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -14,6 +13,7 @@ import org.springframework.web.client.RestClientResponseException;
 
 import com.example.backend.client.request.IngestionRequest;
 import com.example.backend.client.request.QueryRequest;
+import com.example.backend.client.request.UpdateDocumentRequest;
 import com.example.backend.client.response.QueryResponse;
 import com.example.backend.client.response.RagBaseResponse;
 import com.example.backend.config.RagConfig;
@@ -79,6 +79,32 @@ public class RagClient {
                 .uri(ragConfig.getRagProperties().getBaseUrl() + "/documents/" + fileId.toString())
                 .retrieve()
                 .body(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
+        } catch (RestClientResponseException e){
+            RagBaseResponse<Void> responseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
+            throw new RagException(responseData, e.getStatusCode());
+        }
+    }
+
+    public void updateDocument(
+        UUID documentId,
+        String name,
+        LocalDateTime validAt,
+        LocalDateTime expiredAt
+    ){
+        UpdateDocumentRequest body = UpdateDocumentRequest.builder()
+            .name(name)
+            .validAt(validAt == null ? null : validAt.toString())
+            .expiredAt(expiredAt == null ? null : expiredAt.toString())
+            .build();
+        try{
+            restClient.patch()
+                .uri(ragConfig.getRagProperties().getBaseUrl() + "/documents/" + documentId.toString())
+                .body(body).retrieve()
+                .body(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
+            logger.info(
+                "PATCH " + ragConfig.getRagProperties().getBaseUrl()
+                + "/documents/" + documentId + " -> OK"
+            );
         } catch (RestClientResponseException e){
             RagBaseResponse<Void> responseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
             throw new RagException(responseData, e.getStatusCode());

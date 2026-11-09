@@ -14,18 +14,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.backend.dto.request.PatchDocumentRequest;
 import com.example.backend.dto.response.BaseResponse;
 import com.example.backend.dto.response.document.GetDocumentContentResponse;
 import com.example.backend.dto.response.document.UploadDocumentResponse;
 import com.example.backend.entity.Document;
 import com.example.backend.service.DocumentService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 @Controller
@@ -87,11 +91,11 @@ public class DocumentController {
         return ResponseEntity.ok().body(responseData);
     }
 
-    @GetMapping("/{fileId}/download")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID fileId) {
-        if(fileId == null)
-            throw new IllegalStateException("fileId is null");
-        GetDocumentContentResponse file = documentService.getDocumentContents(fileId);
+    @GetMapping("/{documentId}/download")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable UUID documentId) {
+        if(documentId == null)
+            throw new IllegalStateException("document id is null");
+        GetDocumentContentResponse file = documentService.getDocumentContents(documentId);
         return ResponseEntity.ok()
                 .header(
                     HttpHeaders.CONTENT_DISPOSITION,
@@ -101,11 +105,11 @@ public class DocumentController {
                 .body(file.getContent());
     }
 
-    @GetMapping("/{fileId}/view")
-    public ResponseEntity<byte[]> viewFile(@PathVariable UUID fileId) {
-        if(fileId == null)
-            throw new IllegalStateException("fileId is null");
-        GetDocumentContentResponse file = documentService.getDocumentContents(fileId);
+    @GetMapping("/{documentId}/view")
+    public ResponseEntity<byte[]> viewFile(@PathVariable UUID documentId) {
+        if(documentId == null)
+            throw new IllegalStateException("documentId is null");
+        GetDocumentContentResponse file = documentService.getDocumentContents(documentId);
         return ResponseEntity.ok()
                 .header(
                     HttpHeaders.CONTENT_DISPOSITION,
@@ -115,4 +119,16 @@ public class DocumentController {
                 .body(file.getContent());
     }
 
+    @PatchMapping("/{documentId}")
+    public ResponseEntity<BaseResponse<Document>> patchDocument(
+        @PathVariable UUID documentId,
+        @RequestBody @Valid PatchDocumentRequest request
+    ) {
+        Document document = documentService.patchDocument(documentId, request);
+        BaseResponse<Document> responseData = BaseResponse.success(
+            "Update document successfully",
+            document
+        );
+        return ResponseEntity.ok().body(responseData);
+    }
 }

@@ -6,7 +6,7 @@ import com.example.backend.entity.Document;
 public class DocumentMapper {
     public static GetDocumentResponse toAdminGetDocument(Document document){
         GetDocumentResponse getDocumentResponse = GetDocumentResponse.builder()
-            .id(document.getId()).name(document.getName()).fileSize(document.getSize())
+            .id(document.getId()).name(document.getName()).size(document.getSize())
             .mimeType(document.getMimeType()).userId(document.getUserId())
             .uploadedAt(document.getUploadedAt()).build();
         
@@ -15,7 +15,7 @@ public class DocumentMapper {
 
     public static GetDocumentResponse toStudentGetDocument(Document document) {
         GetDocumentResponse getDocumentResponse = GetDocumentResponse.builder()
-            .id(document.getId()).name(document.getName()).fileSize(document.getSize())
+            .id(document.getId()).name(document.getName()).size(document.getSize())
             .mimeType(document.getMimeType()).build();
         
         return getDocumentResponse;
