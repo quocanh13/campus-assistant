@@ -1,46 +1,50 @@
 package com.example.backend.service;
 
-import java.util.Optional;
-// import java.util.UUID;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend.dto.request.LoginRequest;
 import com.example.backend.dto.response.auth.LoginResponse;
 import com.example.backend.dto.response.auth.LoginUserInfo;
+import com.example.backend.entity.Account;
 import com.example.backend.exception.business.BusinessError;
 import com.example.backend.exception.business.BusinessException;
+import com.example.backend.repository.AccountRepository;
+import com.example.backend.security.JwtData;
 import com.example.backend.security.JwtService;
 import com.example.backend.security.PasswordService;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class AuthService {
-    // private final JwtService jwtService;
-    // private final PasswordService passwordService;
+    private final AccountRepository accountRepository;
+    private final PasswordService passwordService;
+    private final JwtService jwtService;
 
-    // public AuthService(
-    //     UserRepository userRepository,
-    //     JwtService jwtService,
-    //     PasswordService passwordService
-    // ){
-    //     this.userRepository = userRepository;
-    //     this.jwtService = jwtService;
-    //     this.passwordService = passwordService;
-    // }
+    @Transactional(readOnly = true)
+    public LoginResponse login(LoginRequest request) {
+        String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
 
-    // public LoginResponse login(LoginRequest loginRequest){
-    //     Optional<User> optionalUser = userRepository.findByUsername(loginRequest.getUsername());
-    //     User user = optionalUser.orElseThrow(()->{
-    //         throw new BusinessException(BusinessError.USER_NOT_FOUND);
-    //     });
+        Account account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException(BusinessError.INVALID_CREDENTIALS));
 
-    //     if(!passwordService.verify(loginRequest.getPassword(), user.getHashedPassword())){
-    //         throw new BusinessException(BusinessError.INVALID_PASSWORD);
-    //     }
+        if (!passwordService.verify(request.getPassword(), account.getPassword())) {
+            throw new BusinessException(BusinessError.INVALID_CREDENTIALS);
+        }
 
-    //     JwtData jwtData = UserMapper.toJwtData(user);
-    //     String token = jwtService.generateToken(jwtData);
-    //     LoginUserInfo userInfo = UserMapper.toLoginUserInfo(user);
-    //     return new LoginResponse(token, userInfo);
-    // }
+        JwtData jwtData = new JwtData(account.getId(), account.getRole());
+        String token = jwtService.generateToken(jwtData);
+
+        LoginUserInfo userInfo = LoginUserInfo.builder()
+                .id(account.getId())
+                .email(account.getEmail())
+                .role(account.getRole())
+                .build();
+
+        return new LoginResponse(token, userInfo);
+    }
 }

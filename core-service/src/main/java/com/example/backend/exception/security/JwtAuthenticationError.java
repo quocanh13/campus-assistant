@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 public enum JwtAuthenticationError{
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED),
-    TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST),
+    TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED);
 
 

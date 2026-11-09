@@ -8,6 +8,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import com.example.backend.dto.response.BaseResponse;
+import com.example.backend.exception.security.JwtAuthenticationError;
 import com.example.backend.exception.security.JwtAuthenticationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,7 +31,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException {
-        JwtAuthenticationException jwtAuthException = (JwtAuthenticationException) authException;
+        JwtAuthenticationException jwtAuthException;
+        if (authException instanceof JwtAuthenticationException exception) {
+            jwtAuthException = exception;
+        } else {
+            jwtAuthException = new JwtAuthenticationException(
+                    JwtAuthenticationError.TOKEN_NOT_FOUND);
+        }
+
         BaseResponse<Void> body;
             body = BaseResponse.<Void>builder()
             .code(jwtAuthException.getCode())

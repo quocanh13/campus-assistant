@@ -1,10 +1,11 @@
 package com.example.backend.filter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -12,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.backend.exception.security.JwtAuthenticationError;
 import com.example.backend.exception.security.JwtAuthenticationException;
 import com.example.backend.security.JwtAuthenticationEntryPoint;
+import com.example.backend.security.JwtData;
 import com.example.backend.security.JwtService;
 
 import jakarta.servlet.FilterChain;
@@ -35,47 +37,38 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        String path = request.getServletPath();
-        return path.startsWith("/auth");
+        return request.getServletPath().startsWith("/auth");
     }
 
     @Override
     protected void doFilterInternal(
-        @NonNull HttpServletRequest request, 
-        @NonNull HttpServletResponse response, 
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         try {
-            // String token = null;
-
-            // String cookieToken = getTokenFromCookie(request.getCookies());
-            // String headerToken = getTokenFromHeader(request.getHeader("Authorization"));
-
-            // token = headerToken == null ? cookieToken : headerToken;
-
-            // if(token == null){
-            //     entryPoint.commence(request, response, new JwtAuthenticationException(JwtAuthenticationError.TOKEN_NOT_FOUND));
-            //     return;
-            // }
-
-            // JwtData jwtData = jwtService.verifyToken(token);
-            // UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            //     jwtData, 
-            //     null, 
-            //     Collections.emptyList()
-            // );
-            // SecurityContextHolder
-            //     .getContext()
-            //     .setAuthentication(authentication);
-            filterChain.doFilter(request, response);
-        } catch (Exception e){
-            JwtAuthenticationException authenticationException;
-            if(e.getClass() == JwtAuthenticationException.class){
-                authenticationException = (JwtAuthenticationException) e;
-            } else {
-                throw new ServletException(e);
+            String token = getTokenFromHeader(request.getHeader("Authorization"));
+            if (token == null) {
+                token = getTokenFromCookie(request.getCookies());
             }
-            entryPoint.commence(request, response, authenticationException);
+
+            if (token == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            JwtData jwtData = jwtService.verifyToken(token);
+            List<SimpleGrantedAuthority> authorities = List.of(
+                    new SimpleGrantedAuthority("ROLE_" + jwtData.getRole().name()));
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(jwtData, null, authorities);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
+        } catch (JwtAuthenticationException exception) {
+            SecurityContextHolder.clearContext();
+            entryPoint.commence(request, response, exception);
         }
     }
 
@@ -92,11 +85,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private static String getTokenFromHeader(String authorization){
         if(authorization == null) return null;
-        String token = null;
         String[] parts = authorization.split(" ");
-        if(parts.length >= 2){
-            token = parts[1];
+        if(parts.length >= 2 && "Bearer".equalsIgnoreCase(parts[0])){
+            return parts[1];
         }
-        return token;
+        return null;
     }
 }
