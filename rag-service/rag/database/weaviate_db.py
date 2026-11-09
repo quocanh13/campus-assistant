@@ -148,6 +148,34 @@ class WeaviateDB:
         self.collection.data.delete_many(
             where=filter
         )
+
+    def update_by_document_id(
+        self,
+        document_id: uuid.UUID,
+        document_name: str | None = None,
+        valid_at: datetime | None = None,
+        expired_at: datetime | None = None
+    ):
+        properties = {}
+        if document_name is not None:
+            properties["document_name"] = document_name
+        if valid_at is not None:
+            properties["valid_at"] = valid_at.replace(tzinfo=self.TIMEZONE)
+        if expired_at is not None:
+            properties["expired_at"] = expired_at.replace(tzinfo=self.TIMEZONE)
+        if len(properties) == 0:
+            return
+
+        filter = Filter.by_property("document_id").equal(document_id)
+        response = self.collection.query.fetch_objects(
+            filters=filter,
+            limit=10000
+        )
+        for item in response.objects:
+            self.collection.data.update(
+                uuid=item.uuid,
+                properties=properties
+            )
         
     def delete_all(self):
         filter = Filter.by_property("document_id").not_equal(uuid.uuid4())

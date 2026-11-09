@@ -26,6 +26,17 @@ def delete_document(id: uuid.UUID):
     response = BaseResponse.success()
     return response.model_dump(exclude_none=True)
 
+@router.patch("/documents/{id}")
+def update_document(id: uuid.UUID, request: UpdateDocumentRequest):
+    weaviate_db.update_by_document_id(
+        document_id=id,
+        document_name=request.document_name,
+        valid_at=request.valid_at,
+        expired_at=request.expired_at
+    )
+    response = BaseResponse.success()
+    return response.model_dump(exclude_none=True)
+
 
 @router.get("/chunks")
 def get_chunk(

@@ -12,6 +12,11 @@ class IngestDocumentRequest(BaseModel):
     keywords: list[str]
     valid_at: datetime
     expired_at: datetime = datetime.fromisoformat("5000-01-01T00:00:00")
+
+class UpdateDocumentRequest(BaseModel):
+    document_name: str | None = None
+    valid_at: datetime | None = None
+    expired_at: datetime | None = None
   
 class RetrieveRequest(BaseModel):
     query: str
