@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend.dto.request.CreateStudentRequest;
+import com.example.backend.dto.request.PatchStudentRequest;
 import com.example.backend.dto.response.student.StudentResponse;
 import com.example.backend.entity.Account;
 import com.example.backend.entity.AccountRole;
@@ -74,5 +75,66 @@ public class StudentService {
         }
 
         return StudentMapper.toResponse(student);
+    }
+
+    @Transactional(readOnly = true)
+    public StudentResponse getStudent(Integer id) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        BusinessError.STUDENT_NOT_FOUND,
+                        ResourceUtil.createArgs(String.valueOf(id))));
+
+        return StudentMapper.toResponse(student);
+    }
+
+    @Transactional
+    public StudentResponse patchStudent(Integer id, PatchStudentRequest request) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        BusinessError.STUDENT_NOT_FOUND,
+                        ResourceUtil.createArgs(String.valueOf(id))));
+
+        if (request.getName() != null) {
+            student.setName(request.getName().trim());
+        }
+
+        if (request.getCohort() != null) {
+            student.setCohort(request.getCohort());
+        }
+
+        if (request.getMajor() != null) {
+            String majorCode = request.getMajor().trim();
+
+            if (!majorRepository.existsById(majorCode)) {
+                throw new BusinessException(
+                        BusinessError.MAJOR_NOT_FOUND,
+                        ResourceUtil.createArgs(majorCode));
+            }
+
+            student.setMajor(majorCode);
+        }
+
+        try {
+            student = studentRepository.saveAndFlush(student);
+        } catch (DataIntegrityViolationException exception) {
+            throw new BusinessException(BusinessError.UPDATE_STUDENT_FAILED);
+        }
+
+        return StudentMapper.toResponse(student);
+    }
+
+    @Transactional
+    public void deleteStudent(Integer id) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(
+                        BusinessError.STUDENT_NOT_FOUND,
+                        ResourceUtil.createArgs(String.valueOf(id))));
+
+        try {
+            studentRepository.delete(student);
+            studentRepository.flush();
+        } catch (DataIntegrityViolationException exception) {
+            throw new BusinessException(BusinessError.DELETE_STUDENT_FAILED);
+        }
     }
 }
