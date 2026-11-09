@@ -1,0 +1,100 @@
+name: campus-assistant
+services:
+  agent-service:
+    image: campus-assistant_agent-service
+    build:
+      context: ./agent-service
+      dockerfile: Dockerfile
+    container_name: campus-assistant_agent-service
+    env_file: 
+      - ./env/agent-service.env
+    volumes:
+        - ./agent-service:/campus-assistant/agent-service
+    depends_on:
+      - s3-storage
+      - redis
+    networks:
+        - campus-assistant-network
+    ports:
+      - 5000:5000
+
+  rag-service:
+    image: campus-assistant_rag-service
+    build: 
+        context: ./rag-service
+        dockerfile: Dockerfile
+    container_name: campus-assistant_rag-service
+    env_file:
+      - ./env/rag-service.env
+    volumes:
+        - ./rag-service:/campus-assistant/rag-service
+    depends_on:
+      - s3-storage
+    networks:
+        - campus-assistant-network
+    ports:
+      - 5001:5001
+          
+  core-service:
+    image: campus-assistant_core-service
+    build: 
+        context: ./core
+        dockerfile: Dockerfile
+    container_name: campus-assistant_core-service
+    env_file:
+      - ./env/core.env
+    ports:
+      - 8080:8080
+    volumes:
+        - ./core:/campus-assistant/core-service
+    networks:
+        - campus-assistant-network
+    depends_on:
+      - mysql-database
+      - s3-storage
+  
+  mysql-database:
+    image: mysql:8.4
+    container_name: campus-assistant_mysql-database
+    env_file:
+      - ./env/mysql-database.env
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+    networks:
+        - campus-assistant-network
+
+  s3-storage:
+    image: quay.io/minio/minio
+    container_name: campus-assistant_s3-storage
+    env_file:
+      - ./env/s3-storage.env
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - campus-assistant-network
+    volumes:
+      - s3-data:/data
+
+  redis:
+    image: redis:latest
+    container_name: campus-assistant_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - campus-assistant-network
+    volumes:
+      - redis-data:/data
+
+networks:
+  campus-assistant-network:
+      driver: bridge
+volumes:
+  mysql-data:
+    name: campus-assistant_mysql-data
+  s3-data:
+    name: campus-assistant_s3-data
+  redis-data:
+    name: campus-assistant_redis-data
