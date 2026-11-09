@@ -37,7 +37,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        return request.getServletPath().startsWith("/auth");
+        String path = request.getServletPath();
+        if (path.startsWith("/auth")) {
+            return true;
+        }
+        return "POST".equalsIgnoreCase(request.getMethod())
+                && (path.equals("/accounts") || path.equals("/students"));
     }
 
     @Override
