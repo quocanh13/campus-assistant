@@ -15,7 +15,7 @@ def chat(conversation_id: str, request: ChatRequest):
     )
     return response.model_dump(exclude_none=True)
 
-@router.get("/analyze/documents/{document_id}")
+@router.get("/documents/{document_id}/analyze")
 def analyze_document(document_id: str):
     result = analyzer_service.analyze_document(document_id)
     response = BaseResponse.success(

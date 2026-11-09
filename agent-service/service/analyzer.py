@@ -8,7 +8,7 @@ PROMPT = """
 Bạn là một chuyên gia phân tích tài liệu.
 
 Hãy đọc toàn bộ nội dung document được cung cấp và tạo
-một bản mô tả ngắn gọn khoảng 400-500 từ bằng tiếng Việt.
+một bản mô tả ngắn gọn dưới 2000 ký tự (bao gồm cả khoảng trắng) bằng tiếng Việt.
 
 Mục đích của bản mô tả là lưu vào MySQL Database
 và sử dụng FULLTEXT INDEX để tìm kiếm tài liệu.
