@@ -2,6 +2,8 @@ import logging
 from fastapi import FastAPI
 from app.config import app_config
 from api.routers import router
+from api.exception_handler import *
+from api.exception import *
 
 _logger = logging.getLogger(__name__)
 fast_api_config = app_config.fast_api_config
@@ -13,5 +15,12 @@ app = FastAPI(
 )
 
 app.include_router(router)
+
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(BusinessException, business_exception_handler)
+app.add_exception_handler(ServerError, model_exception_handler)
+app.add_exception_handler(ClientError, model_exception_handler)
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(Exception, global_exception_handler)
 
 _logger.info("Created app")        

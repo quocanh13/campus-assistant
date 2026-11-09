@@ -1,17 +1,24 @@
 from fastapi import APIRouter
-from api.schemas import *
-from api.dependency import *
+from api.schema import *
+from dependency.agent import agent_service, analyzer_service
 
 router = APIRouter()
 
-@router.post("/chat/{chat_id}")
-def post_chat(chat_id: str, request: PostChatRequest):
-    data = chat_service.chat(
-        chat_id=chat_id,
+@router.post("/chat/{conversation_id}")
+def chat(conversation_id: str, request: ChatRequest):
+    result = agent_service.chat(
+        conversation_id=conversation_id,
         request=request
     )
     response = BaseResponse.success(
-        data=data
+        data=result
     )
     return response.model_dump(exclude_none=True)
-    
+
+@router.get("/analyze/documents/{document_id}")
+def analyze_document(document_id: str):
+    result = analyzer_service.analyze_document(document_id)
+    response = BaseResponse.success(
+        data=result
+    )
+    return response.model_dump(exclude_none=True)

@@ -1,6 +1,6 @@
-def get_chat_config(chat_id: str):
+def get_chat_config(conversation_id: str):
     return {
         "configurable" : {
-            "thread_id" : chat_id
+            "thread_id" : conversation_id
         }
     }

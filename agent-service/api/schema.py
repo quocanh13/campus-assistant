@@ -1,12 +1,15 @@
+from uuid import UUID
 from pydantic import BaseModel
 from typing import Any
+from datetime import datetime
 
-class PostChatRequest(BaseModel):
+class ChatRequest(BaseModel):
     message: str
     
-class PostChatResponse(BaseModel):
+class ChatResponse(BaseModel):
     answer: str
-    
+    rag_data: list[dict]
+
 class BaseResponse(BaseModel):
     code: str
     message: str | None

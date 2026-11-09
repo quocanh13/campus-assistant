@@ -1,12 +1,12 @@
-import google.genai.errors as model_errors
 import logging
 from fastapi import Request
-from .schemas import BaseResponse
+from .schema import BaseResponse
 from .exception import BusinessException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from api.resources.resource import get_exception_state
+from google.genai.errors import ServerError, ClientError
 
 _logger = logging.getLogger(__name__)
 
@@ -63,12 +63,16 @@ async def http_exception_handler(
 
 async def model_exception_handler(
     request: Request,
-    exception: model_errors.ServerError | model_errors.ClientError
+    exception: ServerError | ClientError
 ) : 
     response_data = BaseResponse.error(
         code=exception.status,
         message=exception.message
     )
+    
+    if(exception.code == 503):
+        response_data.message = "Agent is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later."
+    
     return JSONResponse(
         status_code=exception.code,
         content=response_data.model_dump(exclude_none=True)

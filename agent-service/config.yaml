@@ -7,3 +7,13 @@ logging:
   level: DEBUG
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   filename: app.log
+
+mysql:
+  pool_name: "parking_pool"
+  pool_size: 5
+
+s3:
+  bucket: campus-assistant
+
+debug:
+  num_hyphen: 60

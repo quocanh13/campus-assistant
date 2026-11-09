@@ -1,0 +1,47 @@
+import requests
+from uuid import UUID
+from client.schema import BaseResponse, RetrievalChunks
+
+class RagClient:
+    def __init__(
+        self,
+        base_url: str
+    ):
+        self._base_url = base_url
+        
+    def retrieve(
+        self,
+        query: str,
+        keywords: list[str],
+        cohort: int | None,
+        is_valid: bool,
+        document_id: UUID
+    ):
+        url = f"{self._base_url}/retrieve"
+        request_data = {
+            "query" : query,
+            "keywords": keywords,
+            "cohort" : cohort,
+            "is_valid" : is_valid,
+            "document_id": document_id
+        }
+        response = requests.post(
+            url=url,
+            json=request_data
+        )
+        response_data = BaseResponse[list[RetrievalChunks]].model_validate(response.json())
+        return response_data.data
+    
+    def get_chunks(
+        self,
+        document_id: str,
+        from_index: int,
+        to_index: int
+    ):
+        url = f"{self._base_url}/chunks?document_id={document_id}&from_index={from_index}&to_index={to_index}"
+        response = requests.get(url)
+        if response.status_code >= 300:
+            response_data = BaseResponse[None].model_validate(response.json())
+            return response_data
+        response_data = BaseResponse[RetrievalChunks].model_validate(response.json())
+        return response_data.data
