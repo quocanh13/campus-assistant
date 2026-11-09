@@ -4,9 +4,9 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class IngestDocumentRequest(BaseModel):
-    file_id: uuid.UUID
-    file_type: str
-    file_name: str
+    document_id: uuid.UUID
+    document_type: str
+    document_name: str
     from_cohort: int
     to_cohort: int
     keywords: list[str]
@@ -18,7 +18,8 @@ class RetrieveRequest(BaseModel):
     keywords: list[str] = []
     cohort: int | None = None
     is_valid: bool = True
-
+    document_id: uuid.UUID | None = None
+    
 class BaseResponse(BaseModel):
     code: str
     message: str | None = None

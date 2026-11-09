@@ -18,19 +18,30 @@ class Retriever:
     
         index_lists: dict[UUID, list[tuple[int, int]]] = {}
         for chunk in chunks:
-            file_id = chunk.properties["file_id"]
+            document_id = chunk.properties["document_id"]
             chunk_index = chunk.properties["chunk_index"]
-            index_lists[file_id] = index_lists.get(file_id, [])
-            index_lists[file_id].append((chunk_index - self._adj_limit, chunk_index + self._adj_limit))
+            index_lists[document_id] = index_lists.get(document_id, [])
+            index_lists[document_id].append((chunk_index - self._adj_limit, chunk_index + self._adj_limit))
             
-        related_file = []
         doc_contexts = []
-        for file_id, index_list in index_lists.items():
-            related_file.append(file_id)
+        result = []
+        for document_id, index_list in index_lists.items():
             index_list = self._filter_index(index_list)
-            doc_contexts.append(self._get_doc_context(file_id, index_list))
-        context = "\n".join(doc_contexts)
-        return context, related_file
+            for start, end in index_list:
+                chunks = self._weaviate_db.find_by_chunk_index(document_id, (start, end))
+                contents = [chunk.properties["content"] for chunk in chunks]
+                merged_content = "".join(contents)
+                result.append({
+                    "document_id" : document_id,
+                    "document_name" : chunks[0].properties["document_name"],
+                    "from_index" : start,
+                    "to_index" : end,
+                    "valid_at" : chunks[0].properties["valid_at"],
+                    "expired_at" : chunks[0].properties["expired_at"],
+                    "content" : merged_content
+                })
+        result = sorted(result, key=lambda x: x["valid_at"], reverse=True)
+        return result
     
     def _get_doc_context(self, file_id: UUID, index_list: list[tuple[int, int]]):
             chunks = self._weaviate_db.find_by_chunk_index(file_id, index_list)

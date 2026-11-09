@@ -1,5 +1,5 @@
 weaviate:
-  collection: campus_policy
+  collection: campus_assistant
 
 ingestion:
   chunk_size: 512
@@ -21,11 +21,11 @@ generation:
 
 
 s3:
-  bucket: campus-policy
+  bucket: campus-assistant
 
 fast_api:
-  title: "Campus Policy"
-  description: "RAG system for campus policy lookup"
+  title: "Campus assistant"
+  description: "RAG system for campus assistant lookup"
   version: 0.0.0
 
 logging:

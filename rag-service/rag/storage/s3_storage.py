@@ -17,10 +17,10 @@ class S3:
         )
         self.bucket = bucket
     
-    def get_file(self, file_id: uuid.UUID) -> bytes:
+    def get_file(self, document_id: uuid.UUID) -> bytes:
         response = self.client.get_object(
             Bucket=self.bucket,
-            Key=str(file_id)
+            Key=str(document_id)
         )
 
         data = response["Body"].read()

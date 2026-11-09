@@ -23,20 +23,23 @@ class RetrivalPipeline:
         query: str,
         cohort: int | None = None,
         keywords: list[str] = [],
-        is_valid = True
+        is_valid = True,
+        document_id: UUID | None = None
     ) -> dict:
         
         vector_chunks = self._weaviate_db.dense_search(
             query=query,
             limit=self._search_limit,
             cohort=cohort,
-            is_valid=is_valid
+            is_valid=is_valid,
+            document_id=document_id
         )
         bm25_chunks = self._weaviate_db.bm25_search(
             query=" ".join(keywords),
             limit=self._search_limit,
             cohort=cohort,
-            is_valid=is_valid
+            is_valid=is_valid,
+            document_id=document_id
         )
         
         chunk_ranks: dict[UUID, list[int | None]] = {}
@@ -58,10 +61,7 @@ class RetrivalPipeline:
             del scores[best_id]
             
         
-        context, ids = self._retriever.retrieve(
+        result = self._retriever.retrieve(
             chunks=reanked_chunks
         )
-        result: dict = {}
-        result["context"] = context
-        result["related_document_ids"] = ids
         return result

@@ -6,7 +6,7 @@ from rag import *
 router = APIRouter()
 
 @router.post("/ingest")
-async def ingest_document(request: IngestDocumentRequest):
+def ingest_document(request: IngestDocumentRequest):
     ingestion_pipeline.run(
         document_id=request.document_id, 
         document_type=request.document_type,
@@ -21,14 +21,14 @@ async def ingest_document(request: IngestDocumentRequest):
     return response.model_dump(exclude_none=True)
 
 @router.delete("/documents/{id}")
-async def delete_document(id: uuid.UUID):
+def delete_document(id: uuid.UUID):
     weaviate_db.delete_by_document_id(id)
     response = BaseResponse.success()
     return response.model_dump(exclude_none=True)
 
 
 @router.get("/chunks")
-async def get_chunk(
+def get_chunk(
     document_id: uuid.UUID,
     from_index: int,
     to_index: int
@@ -73,7 +73,7 @@ async def get_chunk(
     return response.model_dump(exclude_none=True)
 
 @router.post("/retrieve")
-async def retrieve(
+def retrieve(
     request: RetrieveRequest, 
 ):
     result = retrieval_pipeline.retrieve(

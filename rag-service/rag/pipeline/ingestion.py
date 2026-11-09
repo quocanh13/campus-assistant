@@ -21,22 +21,23 @@ class IngestionPipeline:
         
     def run(
         self,
-        file_id: UUID,
-        file_name: str,
-        file_type: str,
+        document_id: UUID,
+        document_name: str,
+        document_type: str,
         from_cohort: int,
         to_cohort: int,
         keywords: list[str],
         valid_at: datetime,
         expired_at: datetime
     ) -> dict: 
-        file_data = self.storage.get_file(file_id=file_id)
-        doc = read_doc(data=file_data, file_type=file_type)
+        document_data = self.storage.get_file(document_id=document_id)
+        doc = read_doc(data=document_data, file_type=document_type)
         chunks = create_chunk_by_size(doc=doc, size=self.chunk_size)
         chunk_index = 0
         for content in chunks:
             self.database.insert(
-                file_id=file_id, 
+                document_id=document_id, 
+                document_name=document_name,
                 content=content, 
                 chunk_index=chunk_index,
                 from_cohort=from_cohort,

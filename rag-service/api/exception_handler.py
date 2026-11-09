@@ -1,5 +1,6 @@
 import google.genai.errors as model_errors
 import logging
+from http import HTTPStatus
 from fastapi import Request
 from .schemas import BaseResponse
 from .exception import BusinessException
@@ -53,11 +54,11 @@ async def http_exception_handler(
     exception: HTTPException
 ) : 
     response_data = BaseResponse.error(
-        code="RESOURCE_NOT_FOUND",
+        code=HTTPStatus(exception.status_code).name,
         message=exception.detail,      
     )
     return JSONResponse(
-        status_code=404,
+        status_code=exception.status_code,
         content=response_data.model_dump(exclude_none=True)
     )
 
