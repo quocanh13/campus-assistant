@@ -8,6 +8,7 @@ _logger = logging.getLogger(__name__)
 
 class WeaviateDB:
     TIMEZONE = timezone(timedelta(hours=7))
+    MAX_RESULTS = 100000
     
     def __init__(
         self,
@@ -135,7 +136,8 @@ class WeaviateDB:
             )
             response = self.collection.query.fetch_objects(
                 filters=filters,
-                sort=Sort.by_property("chunk_index", ascending=True)
+                sort=Sort.by_property("chunk_index", ascending=True),
+                limit=min(max(1, end - start + 1), self.MAX_RESULTS)
             )
             result.extend(response.objects)
         return result        

@@ -58,28 +58,24 @@ def get_chunk(
         document_id=document_id,
         index=(from_index, to_index)
     )
-    num_chunks = len(result)
-    if(num_chunks == 0):
+    if(len(result) == 0):
         raise HTTPException(
             status_code=404,
             detail="No chunk was found"
         )
-        
-    chunk = result[0].properties
-    contents = [record.properties["content"] for record in result]
-    merged_content = "".join(contents)
-    data = {
-        "document_id" : chunk["document_id"],
-        "document_name" : chunk["document_name"],
-        "from_cohort" : chunk["from_cohort"],
-        "to_cohort" : chunk["to_cohort"],
-        "valid_at" : chunk["valid_at"],
-        "expired_at" : chunk["expired_at"],
-        "from_index" : from_index,
-        "to_index" : from_index + num_chunks - 1,
-        "content" : merged_content
-    }
-    
+
+    data = [
+        {
+            "document_id" : record.properties["document_id"],
+            "document_name" : record.properties["document_name"],
+            "index" : record.properties["chunk_index"],
+            "valid_at" : record.properties["valid_at"],
+            "expired_at" : record.properties["expired_at"],
+            "content" : record.properties["content"]
+        }
+        for record in result
+    ]
+
     response = BaseResponse.success(data=data)
     return response.model_dump(exclude_none=True)
 
