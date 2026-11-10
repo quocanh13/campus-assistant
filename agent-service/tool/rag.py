@@ -1,7 +1,6 @@
 from util.print_info import print_tool_info
 from langchain.tools import tool, ToolRuntime
 from agent.context import AgentContext
-from client.schema import RetrievalChunks
 from dependency.client import rag_client, redis_client
 
 RAG_CACHE_KEY = "rag:{document_id}:{chunk_index}"
@@ -41,28 +40,22 @@ def _fetch_chunk(
     document_id: str,
     chunk_index: int
 ) -> dict | None:
-    data = rag_client.get_chunks(
+    chunks = rag_client.get_chunks(
         document_id=document_id,
         from_index=chunk_index,
         to_index=chunk_index
     )
-    if not isinstance(data, RetrievalChunks):
+    if not chunks:
         return None
-    if data.from_index != chunk_index:
+    chunk = chunks[0]
+    if chunk.index != chunk_index:
         return None
-    chunk = {
-        "document_id" : str(data.document_id),
-        "document_name" : data.document_name,
-        "index" : data.from_index,
-        "valid_at" : data.valid_at,
-        "expired_at" : data.expired_at,
-        "content" : data.content
-    }
+    result = chunk.model_dump(mode="json")
     redis_client.set(
         key=_cache_key(document_id, chunk_index),
-        value=chunk
+        value=result
     )
-    return chunk
+    return result
 
 def _get_chunk(
     document_id: str,

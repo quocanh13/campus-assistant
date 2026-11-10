@@ -1,6 +1,6 @@
 import requests
 from uuid import UUID
-from client.schema import BaseResponse, RetrievedChunk, RetrievalChunks
+from client.schema import BaseResponse, RetrievedChunk
 
 class RagClient:
     def __init__(
@@ -34,14 +34,20 @@ class RagClient:
 
     def get_chunks(
         self,
-        document_id: str,
+        document_id: UUID | str,
         from_index: int,
         to_index: int
-    ):
-        url = f"{self._base_url}/chunks?document_id={document_id}&from_index={from_index}&to_index={to_index}"
-        response = requests.get(url)
+    ) -> list[RetrievedChunk] | None:
+        url = f"{self._base_url}/chunks"
+        response = requests.get(
+            url=url,
+            params={
+                "document_id": str(document_id),
+                "from_index": from_index,
+                "to_index": to_index
+            }
+        )
         if response.status_code >= 300:
-            response_data = BaseResponse[None].model_validate(response.json())
-            return response_data
-        response_data = BaseResponse[RetrievalChunks].model_validate(response.json())
+            return None
+        response_data = BaseResponse[list[RetrievedChunk]].model_validate(response.json())
         return response_data.data

@@ -10,15 +10,6 @@ class RetrievedChunk(BaseModel):
     expired_at: str
     content: str
 
-class RetrievalChunks(BaseModel):
-    document_id: uuid.UUID
-    document_name: str
-    from_index: int
-    to_index: int
-    valid_at: str
-    expired_at: str
-    content: str
-
 T = TypeVar("T")
 class BaseResponse(BaseModel, Generic[T]):
     code: str
