@@ -16,6 +16,9 @@ class AgentService:
         request: ChatRequest
     ) -> dict:
         chat_config = get_chat_config(conversation_id=conversation_id)
+        context = AgentContext(
+            conversation_id=conversation_id,
+        )
         result = self.agent.invoke(
             {
                 "messages" : [
@@ -23,9 +26,7 @@ class AgentService:
                 ]
             },
             config=chat_config,
-            context=AgentContext(
-                conversation_id=conversation_id,
-            )
+            context=context
         )
         last_message = result["messages"][-1]
         content = last_message.content
@@ -37,9 +38,10 @@ class AgentService:
 
         data = {
             "answer" : answer,
+            "related_document" : context.related_document,
             "tool_data" : self.get_tool_data(result["messages"])
         }
-         
+          
         return data
     
     @staticmethod

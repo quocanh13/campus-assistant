@@ -1,5 +1,6 @@
 from util.print_info import print_tool_info
-from langchain.tools import tool
+from langchain.tools import tool, ToolRuntime
+from agent.context import AgentContext
 from client.schema import RetrievalChunks
 from dependency.client import rag_client, redis_client
 
@@ -10,6 +11,31 @@ def _cache_key(document_id, chunk_index: int) -> str:
         document_id=document_id,
         chunk_index=chunk_index
     )
+
+def _add_related_document(
+    runtime: ToolRuntime[AgentContext],
+    document_id: str,
+    from_index: int,
+    to_index: int
+):
+    related_document = runtime.context.related_document
+    document_id = str(document_id)
+
+    document = next(
+        (item for item in related_document if item["document_id"] == document_id),
+        None
+    )
+    if document is None:
+        document = {
+            "document_id" : document_id,
+            "chunk_indexes" : []
+        }
+        related_document.append(document)
+
+    for index in range(from_index, to_index + 1):
+        if index not in document["chunk_indexes"]:
+            document["chunk_indexes"].append(index)
+    document["chunk_indexes"].sort()
 
 def _fetch_chunk(
     document_id: str,
@@ -135,6 +161,7 @@ def rag_search(
 
 @tool(response_format="content_and_artifact")
 def get_chunk_by_indexes(
+    runtime: ToolRuntime[AgentContext],
     document_id: str,
     from_index: int,
     to_index: int
@@ -194,4 +221,5 @@ def get_chunk_by_indexes(
         "expired_at" : merged["expired_at"],
         "content" : merged["content"]
     }
+    _add_related_document(runtime, document_id, from_index, result["to_index"])
     return str(result), result

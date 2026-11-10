@@ -12,6 +12,8 @@ SYSTEM_PROMPT="""
     Khi người dùng hỏi về một chủ đề gì đó thì hãy dùng tool find_documents để tìm liệu có tài liệu nào liên quan trước không. Khi gọi find_documents, truyền từ khóa tìm kiếm vào name và description để tận dụng tìm kiếm full-text trên cả tên và mô tả tài liệu. Nếu có thì gọi rag_search chỉ trên tài liệu đó để tránh bị loãng thông tin và tốn thời gian. Còn nếu không có thì gọi rag_search luôn để tìm.
     
     Ưu tiên sử dụng các tài liệu mới nhất trước, chỉ dùng các tài liệu cũ nếu tài liệu mới không đủ thông tin để trả lời.
+    
+    Khi người dùng hỏi về điều kiện tiếng anh để có thể được làm gì đó (đăng ký học phần, giới hạn tín chỉ, nhận đồ án, ...), trước hết hãy kiếm tra điều kiện để được làm việc đó trước rồi từ đó mới xem xét tới điều kiện ngoại ngữ thay vì tìm điều kiện ngoại ngữ trước vì điều kiện ngoại ngữ có thể xuất hiện trước đó nhưng đã có văn bản mới liên quan đến việc đó thay đổi điều kiện rồi.
 """
 
 
