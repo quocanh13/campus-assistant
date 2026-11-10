@@ -14,7 +14,7 @@ class Retriever:
     def retrieve(
         self, 
         chunks
-    ) -> tuple[str, list[UUID]]:
+    ) -> list[dict]:
     
         index_lists: dict[UUID, list[tuple[int, int]]] = {}
         for chunk in chunks:
@@ -23,25 +23,31 @@ class Retriever:
             index_lists[document_id] = index_lists.get(document_id, [])
             index_lists[document_id].append((chunk_index - self._adj_limit, chunk_index + self._adj_limit))
             
-        doc_contexts = []
-        result = []
+        chunks_by_uuid: dict[UUID, dict] = {}
         for document_id, index_list in index_lists.items():
             index_list = self._filter_index(index_list)
             for start, end in index_list:
-                chunks = self._weaviate_db.find_by_chunk_index(document_id, (start, end))
-                contents = [chunk.properties["content"] for chunk in chunks]
-                merged_content = "".join(contents)
-                result.append({
-                    "document_id" : document_id,
-                    "document_name" : chunks[0].properties["document_name"],
-                    "from_index" : start,
-                    "to_index" : end,
-                    "valid_at" : chunks[0].properties["valid_at"],
-                    "expired_at" : chunks[0].properties["expired_at"],
-                    "content" : merged_content
-                })
-        result = sorted(result, key=lambda x: x["valid_at"], reverse=True)
+                for chunk in self._weaviate_db.find_by_chunk_index(document_id, (start, end)):
+                    chunks_by_uuid[chunk.uuid] = self._to_chunk(chunk)
+        
+        result = sorted(
+            chunks_by_uuid.values(),
+            key=lambda chunk: (str(chunk["document_id"]), chunk["index"])
+        )
+        result.sort(key=lambda chunk: str(chunk["valid_at"]), reverse=True)
         return result
+
+    @staticmethod
+    def _to_chunk(chunk) -> dict:
+        properties = chunk.properties
+        return {
+            "document_id" : properties["document_id"],
+            "document_name" : properties["document_name"],
+            "index" : properties["chunk_index"],
+            "valid_at" : properties["valid_at"],
+            "expired_at" : properties["expired_at"],
+            "content" : properties["content"]
+        }
     
     def _get_doc_context(self, file_id: UUID, index_list: list[tuple[int, int]]):
             chunks = self._weaviate_db.find_by_chunk_index(file_id, index_list)

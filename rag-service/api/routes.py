@@ -91,7 +91,8 @@ def retrieve(
         query=request.query,
         keywords=request.keywords,
         cohort=request.cohort,
-        is_valid=request.is_valid
+        is_valid=request.is_valid,
+        document_id=request.document_id
     )
     response = BaseResponse.success(data=result)
     return response.model_dump(exclude_none=True)

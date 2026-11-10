@@ -25,7 +25,7 @@ class RetrivalPipeline:
         keywords: list[str] = [],
         is_valid = True,
         document_id: UUID | None = None
-    ) -> dict:
+    ) -> list[dict]:
         
         vector_chunks = self._weaviate_db.dense_search(
             query=query,
@@ -54,14 +54,14 @@ class RetrivalPipeline:
             
         scores = self._rrf.rerank(chunk_ranks)
         chunks_by_id = { chunk.uuid: chunk for chunk in [*vector_chunks, *bm25_chunks] }
-        reanked_chunks = []
-        for i in range(self._ranked_limit):
+        ranked_chunks = []
+        for _ in range(min(self._ranked_limit, len(scores))):
             best_id = max(scores, key=scores.get)
-            reanked_chunks.append(chunks_by_id[best_id])
+            ranked_chunks.append(chunks_by_id[best_id])
             del scores[best_id]
             
         
         result = self._retriever.retrieve(
-            chunks=reanked_chunks
+            chunks=ranked_chunks
         )
         return result
