@@ -4,8 +4,8 @@ from dependency.agent import agent_service, analyzer_service
 
 router = APIRouter()
 
-@router.post("/chat/{conversation_id}")
-def chat(conversation_id: str, request: ChatRequest):
+@router.post("/conversation/{conversation_id}")
+def chat(conversation_id: UUID, request: ChatRequest):
     result = agent_service.chat(
         conversation_id=conversation_id,
         request=request
