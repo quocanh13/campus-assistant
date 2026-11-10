@@ -1,13 +1,14 @@
 import uuid
-from typing import Any
+from typing import Generic, TypeVar
 from pydantic import BaseModel
-from typing import Any, Generic, TypeVar
 
-class RetrieveRequest:
-    query: str
-    keywords: list[str] = []
-    cohort: int | None = None
-    is_valid: bool = True
+class RetrievedChunk(BaseModel):
+    document_id: uuid.UUID
+    document_name: str
+    index: int
+    valid_at: str
+    expired_at: str
+    content: str
 
 class RetrievalChunks(BaseModel):
     document_id: uuid.UUID
@@ -24,4 +25,3 @@ class BaseResponse(BaseModel, Generic[T]):
     message: str | None = None
     detail: list[dict] | None = None
     data: T = None
-    

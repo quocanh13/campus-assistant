@@ -1,6 +1,6 @@
 import requests
 from uuid import UUID
-from client.schema import BaseResponse, RetrievalChunks
+from client.schema import BaseResponse, RetrievedChunk, RetrievalChunks
 
 class RagClient:
     def __init__(
@@ -12,26 +12,26 @@ class RagClient:
     def retrieve(
         self,
         query: str,
-        keywords: list[str],
-        cohort: int | None,
-        is_valid: bool,
-        document_id: UUID
-    ):
+        keywords: list[str] = [],
+        cohort: int | None = None,
+        is_valid: bool = True,
+        document_id: UUID | str | None = None
+    ) -> list[RetrievedChunk]:
         url = f"{self._base_url}/retrieve"
         request_data = {
             "query" : query,
             "keywords": keywords,
             "cohort" : cohort,
             "is_valid" : is_valid,
-            "document_id": document_id
+            "document_id": str(document_id) if document_id is not None else None
         }
         response = requests.post(
             url=url,
             json=request_data
         )
-        response_data = BaseResponse[list[RetrievalChunks]].model_validate(response.json())
+        response_data = BaseResponse[list[RetrievedChunk]].model_validate(response.json())
         return response_data.data
-    
+
     def get_chunks(
         self,
         document_id: str,

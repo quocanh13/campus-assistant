@@ -22,10 +22,9 @@ def build_agent(model: str):
         model=model,
         tools=[
             rag_search, 
-            get_next_chunks,
+            get_chunk_by_indexes,
             get_marjor_infomation,
             find_documents,
-            get_chunks_by_index,
             find_major_by_name
         ],
         system_prompt=SYSTEM_PROMPT,
