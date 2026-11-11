@@ -2,6 +2,7 @@ from langchain.agents import create_agent
 from tool.rag import *
 from tool.major import *
 from tool.document import *
+from tool.student import *
 from langgraph.checkpoint.memory import InMemorySaver
 from .context import AgentContext
 
@@ -27,7 +28,8 @@ def build_agent(model: str):
             get_chunk_by_indexes,
             get_marjor_infomation,
             find_documents,
-            find_major_by_name
+            find_major_by_name,
+            get_student_information
         ],
         system_prompt=SYSTEM_PROMPT,
         checkpointer=memory,

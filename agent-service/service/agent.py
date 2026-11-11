@@ -18,6 +18,7 @@ class AgentService:
         chat_config = get_chat_config(conversation_id=conversation_id)
         context = AgentContext(
             conversation_id=conversation_id,
+            student_code=request.student_code,
         )
         result = self.agent.invoke(
             {
