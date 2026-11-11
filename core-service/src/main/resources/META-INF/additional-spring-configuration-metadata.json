@@ -43,5 +43,10 @@
     "name": "jwt.expiration",
     "type": "java.lang.String",
     "description": "Token expiration time"
+  },
+  {
+    "name": "services.agent.base-url",
+    "type": "java.lang.String",
+    "description": "Agent service base url"
   }
 ]}

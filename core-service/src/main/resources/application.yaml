@@ -44,6 +44,9 @@ services:
     rag:
         base-url: ${RAG_ENDPOINT}
 
+    agent:
+        base-url: ${AGENT_ENDPOINT}
+
 jwt:
     secret: ${JWT_SECRET}
     expiration: 10000000000

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -20,14 +21,18 @@ import com.example.backend.config.RagConfig;
 import com.example.backend.entity.Document;
 import com.example.backend.exception.rag.RagException;
 
-import lombok.AllArgsConstructor;
-
 @Component
-@AllArgsConstructor
 public class RagClient {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RestClient restClient;
     private final RagConfig ragConfig;
+
+    public RagClient(
+            @Qualifier("ragRestClient") RestClient restClient,
+            RagConfig ragConfig) {
+        this.restClient = restClient;
+        this.ragConfig = ragConfig;
+    }
 
     public Void ingestDocument(
         Document document,

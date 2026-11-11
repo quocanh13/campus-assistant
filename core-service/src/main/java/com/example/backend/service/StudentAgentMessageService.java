@@ -82,4 +82,24 @@ public class StudentAgentMessageService {
                 .map(StudentAgentMessageMapper::toResponse)
                 .toList();
     }
+
+    @Transactional
+    public StudentAgentMessageResponse createAssistantMessage(
+            UUID conversationId,
+            String content) {
+        StudentAgentMessage message = StudentAgentMessage.builder()
+                .id(UUID.randomUUID())
+                .conversationId(conversationId)
+                .role(MessageRole.ASSISTANT)
+                .content(content != null ? content : "")
+                .build();
+
+        try {
+            message = messageRepository.saveAndFlush(message);
+        } catch (DataIntegrityViolationException exception) {
+            throw new BusinessException(BusinessError.CREATE_MESSAGE_FAILED);
+        }
+
+        return StudentAgentMessageMapper.toResponse(message);
+    }
 }
