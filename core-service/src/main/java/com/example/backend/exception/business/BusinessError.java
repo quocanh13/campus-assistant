@@ -57,7 +57,8 @@ public enum BusinessError{
     UNIT_NOT_FOUND(HttpStatus.NOT_FOUND),
 
     MAJOR_NOT_FOUND(HttpStatus.NOT_FOUND),
-    MAJOR_EXISTS(HttpStatus.CONFLICT);
+    MAJOR_EXISTS(HttpStatus.CONFLICT),
+    UPDATE_MAJOR_FAILED(HttpStatus.INTERNAL_SERVER_ERROR);
 
     @NonNull
     private final HttpStatusCode statusCode;

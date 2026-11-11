@@ -13,11 +13,12 @@ import lombok.Setter;
 @Getter 
 @Setter 
 @AllArgsConstructor 
-@NoArgsConstructor 
+@NoArgsConstructor
 public class Major {
     @Id 
     private String code;
     private String name;
     private String instructionLanguage;
     private String unitCode;
+    private String programType;
 }

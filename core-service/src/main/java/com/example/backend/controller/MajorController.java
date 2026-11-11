@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.backend.dto.request.NewMajorRequest;
+import com.example.backend.dto.request.PatchMajorRequest;
 import com.example.backend.dto.response.BaseResponse;
 import com.example.backend.entity.Major;
 import com.example.backend.service.MajorService;
@@ -15,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +42,16 @@ public class MajorController {
     public ResponseEntity<BaseResponse<Major>> getMajor(@PathVariable  String code) {
         Major newMajor = majorService.getMajor(code);
         BaseResponse<Major> response = BaseResponse.success(null, newMajor);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PatchMapping("/{code}")
+    public ResponseEntity<BaseResponse<Major>> patchMajor(
+        @PathVariable String code,
+        @RequestBody @Valid PatchMajorRequest request
+    ) {
+        Major major = majorService.patchMajor(code, request);
+        BaseResponse<Major> response = BaseResponse.success("Update major successfully", major);
         return ResponseEntity.ok().body(response);
     }
     

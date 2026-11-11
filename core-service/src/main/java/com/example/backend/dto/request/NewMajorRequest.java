@@ -3,6 +3,7 @@ package com.example.backend.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,4 +23,8 @@ public class NewMajorRequest {
     @JsonProperty("unit_code")
     @NotBlank(message = "{validation.major.unit_code.required}")
     private String unitCode;
+
+    @JsonProperty("program_type")
+    @Size(max = 100, message = "{validation.major.program_type.length}")
+    private String programType;
 }
