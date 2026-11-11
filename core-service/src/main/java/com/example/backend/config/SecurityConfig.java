@@ -11,18 +11,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.example.backend.filter.AuthenticationFilter;
 import com.example.backend.security.JwtAuthenticationEntryPoint;
+import com.example.backend.security.RestAccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final AuthenticationFilter authFilter;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
     public SecurityConfig(
             AuthenticationFilter authFilter,
-            JwtAuthenticationEntryPoint authenticationEntryPoint) {
+            JwtAuthenticationEntryPoint authenticationEntryPoint,
+            RestAccessDeniedHandler accessDeniedHandler) {
         this.authFilter = authFilter;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Bean
@@ -32,11 +36,14 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**", "/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/accounts", "/students").permitAll()
                 .requestMatchers("/admins", "/admins/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/documents", "/documents/**").authenticated()
+                .requestMatchers("/documents", "/documents/**").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()
             )
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler)
             )
             .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 
