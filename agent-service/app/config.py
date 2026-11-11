@@ -11,6 +11,11 @@ with open(_config_pth) as file:
     _config_dict: dict = yaml.safe_load(file)    
 
 @dataclass(frozen=True)
+class JwtConfig:
+    algorithm: str = os.getenv("JWT_ALGORITHM")
+    secret_key: str = os.getenv("JWT_SECRET_KEY")
+
+@dataclass(frozen=True)
 class LoggingConfig:
     level: str = _config_dict["logging"]["level"]
     format: str = _config_dict["logging"]["format"]
@@ -65,6 +70,7 @@ class DebugConfig:
 class AppConfig:
     logging_config = LoggingConfig()
     fast_api_config = FastApiConfig()
+    jwt_config = JwtConfig()
     agent_config = AgentConfig()
     rag_client_config = RagClientConfig()
     redis_config = RedisConfig()
