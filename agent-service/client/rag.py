@@ -17,7 +17,7 @@ class RagClient:
         is_valid: bool = True,
         document_id: UUID | str | None = None
     ) -> list[RetrievedChunk]:
-        url = f"{self._base_url}/retrieve"
+        url = f"{self._base_url}/document/retrieve"
         request_data = {
             "query" : query,
             "keywords": keywords,
@@ -38,7 +38,7 @@ class RagClient:
         from_index: int,
         to_index: int
     ) -> list[RetrievedChunk] | None:
-        url = f"{self._base_url}/chunks"
+        url = f"{self._base_url}document/chunks"
         response = requests.get(
             url=url,
             params={
