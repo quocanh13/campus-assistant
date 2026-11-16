@@ -38,7 +38,7 @@ class RagClient:
         from_index: int,
         to_index: int
     ) -> list[RetrievedChunk] | None:
-        url = f"{self._base_url}document/chunks"
+        url = f"{self._base_url}/document/chunks"
         response = requests.get(
             url=url,
             params={
