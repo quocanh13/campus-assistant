@@ -50,10 +50,10 @@ public class RagClient {
         );
         try{
             RagBaseResponse<Void> response = restClient.post()
-                    .uri(ragConfig.getRagProperties().getBaseUrl() + "/ingest")
+                    .uri(ragConfig.getRagProperties().getBaseUrl() + "/document/ingest")
                     .body(body).retrieve()
                     .body(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
-            logger.info("POST " + ragConfig.getRagProperties().getBaseUrl() + "/ingest" + " -> OK");
+            logger.info("POST " + ragConfig.getRagProperties().getBaseUrl() + "/document/ingest" + " -> OK");
             return response.getData();
         } catch (RestClientResponseException e) {
             RagBaseResponse<Void> resonseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
@@ -65,12 +65,12 @@ public class RagClient {
         QueryRequest body = new QueryRequest(query);
         try{
             RagBaseResponse<QueryResponse> response = restClient.post()
-                    .uri(ragConfig.getRagProperties().getBaseUrl() + "/query")
+                    .uri(ragConfig.getRagProperties().getBaseUrl() + "/document/retrieve")
                     .body(body).retrieve()
                     .body(new ParameterizedTypeReference<RagBaseResponse<QueryResponse>>() {});
             if(response == null)
                 throw new IllegalStateException("Query response is null");
-            logger.info("POST " + ragConfig.getRagProperties().getBaseUrl() + "/query" + " -> OK");
+            logger.info("POST " + ragConfig.getRagProperties().getBaseUrl() + "/document/retrieve" + " -> OK");
             return response.getData();  
         } catch (RestClientResponseException e){
             RagBaseResponse<Void> resonseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
@@ -81,7 +81,7 @@ public class RagClient {
     public void deleteDocument(UUID fileId){
         try{
             restClient.delete()
-                .uri(ragConfig.getRagProperties().getBaseUrl() + "/documents/" + fileId.toString())
+                .uri(ragConfig.getRagProperties().getBaseUrl() + "/document/" + fileId.toString())
                 .retrieve()
                 .body(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
         } catch (RestClientResponseException e){
@@ -103,12 +103,12 @@ public class RagClient {
             .build();
         try{
             restClient.patch()
-                .uri(ragConfig.getRagProperties().getBaseUrl() + "/documents/" + documentId.toString())
+                .uri(ragConfig.getRagProperties().getBaseUrl() + "/document/" + documentId.toString())
                 .body(body).retrieve()
                 .body(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
             logger.info(
                 "PATCH " + ragConfig.getRagProperties().getBaseUrl()
-                + "/documents/" + documentId + " -> OK"
+                + "/document/" + documentId + " -> OK"
             );
         } catch (RestClientResponseException e){
             RagBaseResponse<Void> responseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});

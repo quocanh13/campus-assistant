@@ -8,4 +8,6 @@ import com.example.backend.entity.Admin;
 
 public interface AdminRepository extends JpaRepository<Admin, Integer> {
     boolean existsByAccountId(UUID accountId);
+
+    java.util.Optional<Admin> findByAccountId(UUID accountId);
 }

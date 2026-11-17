@@ -22,10 +22,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping({
-        "/student-agent-conversation/{conversationId}/messages",
-        "/student-agent-conversations/{conversationId}/messages"
-})
+@RequestMapping("/student_agent_conversation/{conversation_id}/messages")
 @AllArgsConstructor
 public class StudentAgentMessageController {
     private final StudentAgentMessageService messageService;
@@ -33,7 +30,7 @@ public class StudentAgentMessageController {
     @PostMapping
     public ResponseEntity<BaseResponse<StudentAgentMessageResponse>> createMessage(
             @AuthenticationPrincipal JwtData jwtData,
-            @PathVariable UUID conversationId,
+            @PathVariable("conversation_id") UUID conversationId,
             @Valid @RequestBody CreateStudentAgentMessageRequest request) {
         StudentAgentMessageResponse message = messageService.createMessage(
                 conversationId, jwtData.getAccountId(), request);
@@ -45,7 +42,7 @@ public class StudentAgentMessageController {
     @GetMapping
     public ResponseEntity<BaseResponse<List<StudentAgentMessageResponse>>> getMessages(
             @AuthenticationPrincipal JwtData jwtData,
-            @PathVariable UUID conversationId) {
+            @PathVariable("conversation_id") UUID conversationId) {
         List<StudentAgentMessageResponse> messages = messageService.getMessages(
                 conversationId, jwtData.getAccountId());
         BaseResponse<List<StudentAgentMessageResponse>> response = BaseResponse.success(
@@ -56,7 +53,7 @@ public class StudentAgentMessageController {
     @GetMapping("/{messageId}")
     public ResponseEntity<BaseResponse<StudentAgentMessageResponse>> getMessage(
             @AuthenticationPrincipal JwtData jwtData,
-            @PathVariable UUID conversationId,
+            @PathVariable("conversation_id") UUID conversationId,
             @PathVariable UUID messageId) {
         StudentAgentMessageResponse message = messageService.getMessage(
                 conversationId, messageId, jwtData.getAccountId());
