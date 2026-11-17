@@ -1,2 +1,2 @@
-from .dependency.pipeline import ingestion_pipeline, retrieval_pipeline
-from .dependency.database import weaviate_db
+from .dependency.pipeline import ingest_document_pipeline, retrieve_document_pipeline, ingest_conversation_pipeline, retrieve_conversation_pipeline 
+from .dependency.database import conversation_weaviate, document_weaviate

@@ -17,10 +17,16 @@ class LoggingConfig:
     filename: str = _config_dict["logging"]["filename"]    
     
 @dataclass(frozen=True)
-class WeaviateConfig:
-    url: str = os.getenv("WEAVIATE_URL")
-    api_key: str = os.getenv("WEAVIATE_API_KEY")
-    collection: str = _config_dict["weaviate"]["collection"]
+class DocumentWeaviateConfig:
+    url: str = os.getenv("WEAVIATE_DOCUMENT_URL")
+    api_key: str = os.getenv("WEAVIATE_DOCUMENT_API_KEY")
+    collection: str = _config_dict["weaviate"]["document_collection"]
+
+@dataclass(frozen=True)
+class ConversationWeaviateConfig:
+    url: str = os.getenv("WEAVIATE_CONVERSATION_URL")
+    api_key: str = os.getenv("WEAVIATE_CONVERSATION_API_KEY")
+    collection: str = _config_dict["weaviate"]["conversation_collection"]
 
 @dataclass(frozen=True)
 class S3Config:
@@ -43,11 +49,22 @@ class QueryProcessingConfig:
     
 @dataclass(frozen=True)
 class RetrievalConfig:
-    search_limit: int = int(_config_dict["retrieval"]["search_limit"])
-    ranked_limit: int = int(_config_dict["retrieval"]["ranked_limit"])
-    adj_limit: int = int(_config_dict["retrieval"]["adj_limit"])
-    K: int = int(_config_dict["retrieval"]["K"])
-    ratio: float = float(_config_dict["retrieval"]["ratio"])
+    @dataclass(frozen=True)
+    class Document:
+        search_limit: int = int(_config_dict["retrieval"]["document"]["search_limit"])
+        ranked_limit: int = int(_config_dict["retrieval"]["document"]["ranked_limit"])
+        adj_limit: int = int(_config_dict["retrieval"]["document"]["adj_limit"])
+        K: int = int(_config_dict["retrieval"]["document"]["K"])
+        ratio: float = float(_config_dict["retrieval"]["document"]["ratio"])
+    @dataclass(frozen=True)
+    class Conversation:
+        search_limit: int = int(_config_dict["retrieval"]["conversation"]["search_limit"])
+        ranked_limit: int = int(_config_dict["retrieval"]["conversation"]["ranked_limit"])
+        adj_limit: int = int(_config_dict["retrieval"]["conversation"]["adj_limit"])
+        K: int = int(_config_dict["retrieval"]["conversation"]["K"])
+        ratio: float = float(_config_dict["retrieval"]["conversation"]["ratio"])
+    document = Document()
+    conversation = Conversation()
 
 @dataclass(frozen=True)
 class GenerationConfig:
@@ -65,7 +82,8 @@ class FastApiConfig:
 @dataclass(frozen=True)
 class AppConfig:
     logging_config = LoggingConfig()
-    weaviate_config = WeaviateConfig()
+    document_weaviate_config = DocumentWeaviateConfig()
+    conversation_weaviate_config = ConversationWeaviateConfig()
     s3_config = S3Config()
     ingestion_config = IngestionConfig()
     fast_api_config = FastApiConfig()

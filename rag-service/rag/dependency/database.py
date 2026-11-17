@@ -1,10 +1,17 @@
 from app.config import app_config
-from ..database.weaviate_db import WeaviateDB
+from rag.database import DocumentWeaviate, ConversationWeaviate
 
-_weaviate_config = app_config.weaviate_config
+_document_weaviate_config = app_config.document_weaviate_config
+_conversation_weaviate_config = app_config.conversation_weaviate_config
 
-weaviate_db = WeaviateDB(
-    cluster_url=_weaviate_config.url,
-    api_key=_weaviate_config.api_key,
-    collection=_weaviate_config.collection
+document_weaviate = DocumentWeaviate(
+    cluster_url=_document_weaviate_config.url,
+    api_key=_document_weaviate_config.api_key,
+    collection=_document_weaviate_config.collection
+)
+
+conversation_weaviate = ConversationWeaviate(
+    cluster_url=_conversation_weaviate_config.url,
+    api_key=_conversation_weaviate_config.api_key,
+    collection=_conversation_weaviate_config.collection
 )

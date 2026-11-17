@@ -1,13 +1,13 @@
 from uuid import UUID
-from rag.database.weaviate_db import WeaviateDB
+from rag.database import DocumentWeaviate
 
 class Retriever:
     def __init__(
         self, 
-        weaviate_db: WeaviateDB,
+        document_weaviate: DocumentWeaviate,
         adj_limit: int
     ):
-        self._weaviate_db = weaviate_db
+        self._document_weaviate = document_weaviate
         self._adj_limit = adj_limit
 
 
@@ -27,7 +27,7 @@ class Retriever:
         for document_id, index_list in index_lists.items():
             index_list = self._filter_index(index_list)
             for start, end in index_list:
-                for chunk in self._weaviate_db.find_by_chunk_index(document_id, (start, end)):
+                for chunk in self._document_weaviate.find_by_chunk_index(document_id, (start, end)):
                     chunks_by_uuid[chunk.uuid] = self._to_chunk(chunk)
         
         result = sorted(
@@ -50,7 +50,7 @@ class Retriever:
         }
     
     def _get_doc_context(self, file_id: UUID, index_list: list[tuple[int, int]]):
-            chunks = self._weaviate_db.find_by_chunk_index(file_id, index_list)
+            chunks = self._document_weaviate.find_by_chunk_index(file_id, index_list)
             contents = [chunk.properties["content"] for chunk in chunks]
             doc_context = "".join(contents)
             return(doc_context)

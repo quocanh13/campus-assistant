@@ -6,7 +6,7 @@ from weaviate.classes.query import Filter, MetadataQuery, Sort
 
 _logger = logging.getLogger(__name__)
 
-class WeaviateDB:
+class DocumentWeaviate:
     TIMEZONE = timezone(timedelta(hours=7))
     MAX_RESULTS = 100000
     
@@ -62,7 +62,7 @@ class WeaviateDB:
         is_valid: bool,
         document_id: uuid.UUID | None
     ):
-        current = datetime.now(tz=WeaviateDB.TIMEZONE)
+        current = datetime.now(tz=DocumentWeaviate.TIMEZONE)
         cohort_filter = (
             Filter.by_property("from_cohort").less_or_equal(cohort) & 
             Filter.by_property("to_cohort").greater_or_equal(cohort)

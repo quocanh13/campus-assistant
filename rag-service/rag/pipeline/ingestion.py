@@ -1,22 +1,23 @@
 from uuid import UUID
 from datetime import datetime
 from rag.storage.s3_storage import S3
-from rag.database.weaviate_db import WeaviateDB
+from rag.database import DocumentWeaviate, ConversationWeaviate
 from rag.ingestion.enrichment import Enricher
 from rag.ingestion.read_doc import read_doc
 from rag.ingestion.chunking import create_chunk_by_size
+from api.schemas import ConversationMessage
 
-class IngestionPipeline:
+class IngestDocumentPipeline:
     def __init__(
         self,
         storage: S3,
         chunk_size: int,
-        database: WeaviateDB,
+        document_weaviate: DocumentWeaviate,
         enricher: Enricher
     ):
         self.storage = storage
         self.chunk_size = chunk_size
-        self.database = database
+        self.document_weaviate = document_weaviate
         self.enricher = enricher
         
     def run(
@@ -35,7 +36,7 @@ class IngestionPipeline:
         chunks = create_chunk_by_size(doc=doc, size=self.chunk_size)
         chunk_index = 0
         for content in chunks:
-            self.database.insert(
+            self.document_weaviate.insert(
                 document_id=document_id, 
                 document_name=document_name,
                 content=content, 
@@ -47,4 +48,29 @@ class IngestionPipeline:
                 expired_at=expired_at
             )
             chunk_index += 1
-            
+
+class IngestConversationPipeline:
+    def __init__(
+        self,
+        conversation_weaviate: ConversationWeaviate,
+    ):
+        self.conversation_weaviate = conversation_weaviate
+        
+    def run(
+        self,
+        conversation_id: UUID,
+        title: str,
+        messages: list[ConversationMessage]
+    ):
+        roles = []
+        contents = []
+        for message in messages:
+            roles.append(f"{message.role}")
+            contents.append(f"{message.content}")
+        self.conversation_weaviate.insert(
+            conversation_id=conversation_id,
+            title=title,
+            contents=contents,
+            roles=roles
+        )
+        

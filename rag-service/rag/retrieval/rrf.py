@@ -24,11 +24,11 @@ class RRF:
         ratio: float,
         rank: tuple[int | None, int | None]
     ):
-        bm25_rank, vector_rank = rank
+        first_rank, second_rank = rank
         score = 0.0
-        if bm25_rank is not None:
-            score += (1 - ratio)/(K + bm25_rank)
-        if vector_rank is not None:
-            score += ratio/(K + vector_rank)
+        if first_rank is not None:
+            score += ratio/(K + first_rank)
+        if second_rank is not None:
+            score += (1 - ratio)/(K + second_rank)
         return score
         

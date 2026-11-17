@@ -1,5 +1,5 @@
 import uuid
-from typing import Any
+from typing import Any, Literal
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -12,18 +12,26 @@ class IngestDocumentRequest(BaseModel):
     keywords: list[str]
     valid_at: datetime
     expired_at: datetime = datetime.fromisoformat("5000-01-01T00:00:00")
-
 class UpdateDocumentRequest(BaseModel):
     document_name: str | None = None
     valid_at: datetime | None = None
     expired_at: datetime | None = None
-  
-class RetrieveRequest(BaseModel):
+class RetrieveDocumentRequest(BaseModel):
     query: str
     keywords: list[str] = []
     cohort: int | None = None
     is_valid: bool = True
     document_id: uuid.UUID | None = None
+    
+class ConversationMessage(BaseModel):
+    role: Literal["ADMIN", "STUDENT"]
+    content: str
+class IngestConversationRequest(BaseModel):
+    conversation_id: uuid.UUID
+    title: str
+    messages: list[ConversationMessage]
+class RetrieveConversationRequest(BaseModel):
+    query: str
     
 class BaseResponse(BaseModel):
     code: str
