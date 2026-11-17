@@ -2,6 +2,7 @@ package com.example.backend.client;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 import com.example.backend.client.request.IngestionRequest;
+import com.example.backend.client.request.IngestConversationRequest;
 import com.example.backend.client.request.QueryRequest;
 import com.example.backend.client.request.UpdateDocumentRequest;
 import com.example.backend.client.response.QueryResponse;
@@ -109,6 +111,47 @@ public class RagClient {
             logger.info(
                 "PATCH " + ragConfig.getRagProperties().getBaseUrl()
                 + "/document/" + documentId + " -> OK"
+            );
+        } catch (RestClientResponseException e){
+            RagBaseResponse<Void> responseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
+            throw new RagException(responseData, e.getStatusCode());
+        }
+    }
+
+    public void ingestConversation(
+        UUID conversationId,
+        String title,
+        List<IngestConversationRequest.Message> messages
+    ){
+        IngestConversationRequest body = IngestConversationRequest.builder()
+            .conversationId(conversationId)
+            .title(title)
+            .messages(messages)
+            .build();
+        try{
+            restClient.post()
+                .uri(ragConfig.getRagProperties().getBaseUrl() + "/conversation/ingest")
+                .body(body).retrieve()
+                .body(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
+            logger.info(
+                "POST " + ragConfig.getRagProperties().getBaseUrl()
+                + "/conversation/ingest (" + conversationId + ") -> OK"
+            );
+        } catch (RestClientResponseException e){
+            RagBaseResponse<Void> responseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
+            throw new RagException(responseData, e.getStatusCode());
+        }
+    }
+
+    public void deleteConversation(UUID conversationId){
+        try{
+            restClient.delete()
+                .uri(ragConfig.getRagProperties().getBaseUrl() + "/conversation/" + conversationId.toString())
+                .retrieve()
+                .body(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});
+            logger.info(
+                "DELETE " + ragConfig.getRagProperties().getBaseUrl()
+                + "/conversation/" + conversationId + " -> OK"
             );
         } catch (RestClientResponseException e){
             RagBaseResponse<Void> responseData = e.getResponseBodyAs(new ParameterizedTypeReference<RagBaseResponse<Void>>() {});

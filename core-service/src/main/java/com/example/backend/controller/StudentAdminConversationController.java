@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 public class StudentAdminConversationController {
     private final StudentAdminConversationService conversationService;
 
-    @PostMapping("/student_admin_conversations")
+    @PostMapping("/student-admin-conversations")
     public ResponseEntity<BaseResponse<StudentAdminConversationResponse>> createConversation(
             @AuthenticationPrincipal JwtData jwtData,
             @Valid @RequestBody CreateStudentAdminConversationRequest request) {
@@ -42,7 +42,7 @@ public class StudentAdminConversationController {
     /**
      * Lấy toàn bộ conversation (cả student và admin đều có thể gọi).
      */
-    @GetMapping("/student_admin_conversations")
+    @GetMapping("/student-admin-conversations")
     public ResponseEntity<BaseResponse<List<StudentAdminConversationResponse>>> getAllConversations(
             @AuthenticationPrincipal JwtData jwtData) {
         List<StudentAdminConversationResponse> conversations =
@@ -55,7 +55,7 @@ public class StudentAdminConversationController {
     /**
      * Lấy conversation của chính người gọi: jwt -> account_id -> student/admin id.
      */
-    @GetMapping("/me/student_admin_conversations")
+    @GetMapping("/me/student-admin-conversations")
     public ResponseEntity<BaseResponse<List<StudentAdminConversationResponse>>> getMyConversations(
             @AuthenticationPrincipal JwtData jwtData) {
         List<StudentAdminConversationResponse> conversations =
@@ -65,7 +65,7 @@ public class StudentAdminConversationController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/student_admin_conversations/{id}")
+    @GetMapping("/student-admin-conversations/{id}")
     public ResponseEntity<BaseResponse<StudentAdminConversationResponse>> getConversation(
             @AuthenticationPrincipal JwtData jwtData,
             @PathVariable UUID id) {
@@ -76,7 +76,7 @@ public class StudentAdminConversationController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping("/student_admin_conversations/{id}")
+    @PatchMapping("/student-admin-conversations/{id}")
     public ResponseEntity<BaseResponse<StudentAdminConversationResponse>> patchConversation(
             @AuthenticationPrincipal JwtData jwtData,
             @PathVariable UUID id,
@@ -88,7 +88,7 @@ public class StudentAdminConversationController {
         return ResponseEntity.ok().body(response);
     }
 
-    @DeleteMapping("/student_admin_conversations/{id}")
+    @DeleteMapping("/student-admin-conversations/{id}")
     public ResponseEntity<BaseResponse<Void>> deleteConversation(
             @AuthenticationPrincipal JwtData jwtData,
             @PathVariable UUID id) {

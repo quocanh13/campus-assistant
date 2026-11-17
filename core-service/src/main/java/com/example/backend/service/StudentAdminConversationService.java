@@ -7,6 +7,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.backend.client.RagClient;
+import com.example.backend.client.request.IngestConversationRequest;
 import com.example.backend.dto.request.CreateStudentAdminConversationRequest;
 import com.example.backend.dto.request.PatchStudentAdminConversationRequest;
 import com.example.backend.dto.response.conversation.StudentAdminConversationResponse;
@@ -19,6 +21,7 @@ import com.example.backend.exception.business.BusinessException;
 import com.example.backend.mapper.StudentAdminConversationMapper;
 import com.example.backend.repository.AdminRepository;
 import com.example.backend.repository.StudentAdminConversationRepository;
+import com.example.backend.repository.StudentAdminMessageRepository;
 import com.example.backend.repository.StudentRepository;
 import com.example.backend.utils.ResourceUtil;
 
@@ -32,6 +35,8 @@ public class StudentAdminConversationService {
     private final StudentAdminConversationRepository conversationRepository;
     private final StudentRepository studentRepository;
     private final AdminRepository adminRepository;
+    private final StudentAdminMessageRepository messageRepository;
+    private final RagClient ragClient;
 
     @Transactional
     public StudentAdminConversationResponse createConversation(
@@ -148,6 +153,8 @@ public class StudentAdminConversationService {
         if (request.getTitle() != null) {
             conversation.setTitle(request.getTitle().trim());
         }
+
+        ConversationState previousState = conversation.getState();
         if (request.getState() != null) {
             conversation.setState(request.getState());
         }
@@ -158,7 +165,27 @@ public class StudentAdminConversationService {
             throw new BusinessException(BusinessError.UPDATE_CONVERSATION_FAILED);
         }
 
+        ConversationState currentState = conversation.getState();
+        if (previousState == ConversationState.PENDING && currentState == ConversationState.DONE) {
+            ingestConversation(conversation);
+        } else if (previousState == ConversationState.DONE && currentState == ConversationState.PENDING) {
+            ragClient.deleteConversation(conversation.getId());
+        }
+
         return StudentAdminConversationMapper.toResponse(conversation);
+    }
+
+    private void ingestConversation(StudentAdminConversation conversation) {
+        List<IngestConversationRequest.Message> messages = messageRepository
+                .findAllByConversationIdOrderByCreatedAtAsc(conversation.getId())
+                .stream()
+                .map(message -> IngestConversationRequest.Message.builder()
+                        .role(message.getRole().name())
+                        .content(message.getContent())
+                        .build())
+                .toList();
+
+        ragClient.ingestConversation(conversation.getId(), conversation.getTitle(), messages);
     }
 
     @Transactional
@@ -176,6 +203,7 @@ public class StudentAdminConversationService {
         }
 
         try {
+            ragClient.deleteConversation(id);
             conversationRepository.delete(conversation);
             conversationRepository.flush();
         } catch (DataIntegrityViolationException exception) {
