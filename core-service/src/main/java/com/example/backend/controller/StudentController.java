@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,6 +15,7 @@ import com.example.backend.dto.request.CreateStudentRequest;
 import com.example.backend.dto.request.PatchStudentRequest;
 import com.example.backend.dto.response.BaseResponse;
 import com.example.backend.dto.response.student.StudentResponse;
+import com.example.backend.security.JwtData;
 import com.example.backend.service.StudentService;
 
 import jakarta.validation.Valid;
@@ -31,6 +33,16 @@ public class StudentController {
         StudentResponse student = studentService.createStudent(request);
         BaseResponse<StudentResponse> response = BaseResponse.success(
                 "Create student successfully", student);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<BaseResponse<StudentResponse>> getMyProfile(
+            @AuthenticationPrincipal JwtData jwtData) {
+        StudentResponse student = studentService.getMyProfile(
+                jwtData.getAccountId(), jwtData.getRole());
+        BaseResponse<StudentResponse> response = BaseResponse.success(
+                "Get my student profile successfully", student);
         return ResponseEntity.ok().body(response);
     }
 

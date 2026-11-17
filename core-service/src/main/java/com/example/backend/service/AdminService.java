@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import com.example.backend.dto.request.CreateAdminRequest;
 import com.example.backend.dto.request.PatchAdminRequest;
 import com.example.backend.dto.response.admin.AdminResponse;
 import com.example.backend.entity.Admin;
+import com.example.backend.entity.AccountRole;
 import com.example.backend.exception.business.BusinessError;
 import com.example.backend.exception.business.BusinessException;
 import com.example.backend.mapper.AdminMapper;
@@ -57,6 +59,20 @@ public class AdminService {
         } catch (DataIntegrityViolationException exception) {
             throw new BusinessException(BusinessError.CREATE_ADMIN_FAILED);
         }
+
+        return AdminMapper.toResponse(admin);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminResponse getMyProfile(UUID accountId, AccountRole role) {
+        if (role != AccountRole.ADMIN) {
+            throw new BusinessException(BusinessError.ACCESS_DENIED);
+        }
+
+        Admin admin = adminRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new BusinessException(
+                        BusinessError.ADMIN_PROFILE_NOT_FOUND,
+                        ResourceUtil.createArgs(accountId)));
 
         return AdminMapper.toResponse(admin);
     }

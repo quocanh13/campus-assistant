@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,6 +18,7 @@ import com.example.backend.dto.request.CreateAdminRequest;
 import com.example.backend.dto.request.PatchAdminRequest;
 import com.example.backend.dto.response.BaseResponse;
 import com.example.backend.dto.response.admin.AdminResponse;
+import com.example.backend.security.JwtData;
 import com.example.backend.service.AdminService;
 
 import jakarta.validation.Valid;
@@ -44,6 +46,16 @@ public class AdminController {
         List<AdminResponse> admins = adminService.getAdmins(index, limit);
         BaseResponse<List<AdminResponse>> response = BaseResponse.success(
                 "Get admins successfully", admins);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<BaseResponse<AdminResponse>> getMyProfile(
+            @AuthenticationPrincipal JwtData jwtData) {
+        AdminResponse admin = adminService.getMyProfile(
+                jwtData.getAccountId(), jwtData.getRole());
+        BaseResponse<AdminResponse> response = BaseResponse.success(
+                "Get my admin profile successfully", admin);
         return ResponseEntity.ok().body(response);
     }
 

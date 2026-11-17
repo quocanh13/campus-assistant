@@ -1,5 +1,7 @@
 package com.example.backend.service;
 
+import java.util.UUID;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +75,20 @@ public class StudentService {
         } catch (DataIntegrityViolationException exception) {
             throw new BusinessException(BusinessError.CREATE_STUDENT_FAILED);
         }
+
+        return StudentMapper.toResponse(student);
+    }
+
+    @Transactional(readOnly = true)
+    public StudentResponse getMyProfile(UUID accountId, AccountRole role) {
+        if (role != AccountRole.STUDENT) {
+            throw new BusinessException(BusinessError.ACCESS_DENIED);
+        }
+
+        Student student = studentRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new BusinessException(
+                        BusinessError.STUDENT_PROFILE_NOT_FOUND,
+                        ResourceUtil.createArgs(accountId)));
 
         return StudentMapper.toResponse(student);
     }
