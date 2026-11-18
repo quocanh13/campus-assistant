@@ -1,5 +1,5 @@
 from app.config import app_config
-from client.rag import RagClient
+from client.rag import DocumentRagClient, ConversationRagClient
 from client.redis import RedisClient
 from client.mysql_db import create_pool
 from client.s3 import S3
@@ -10,7 +10,8 @@ _redis_config = app_config.redis_config
 _mysql_config = app_config.mysql_config
 _s3_config = app_config.s3_config
 
-rag_client = RagClient(_rag_client_config.base_url)
+document_rag_client = DocumentRagClient(_rag_client_config.base_url)
+converstaion_rag_client = ConversationRagClient(_rag_client_config.base_url)
 
 redis_client = RedisClient(
     host=_redis_config.host,
