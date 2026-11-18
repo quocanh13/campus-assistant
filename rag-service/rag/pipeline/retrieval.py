@@ -98,7 +98,6 @@ class RetrieveConversationPipeline:
             
         scores = self.rrf.rerank(chunk_ranks)
         chunks_by_id = { chunk.uuid: chunk for chunk in [*title_query_chunks, *content_query_chunks] }
-        
         ranked_chunks = []
         for _ in range(min(self.ranked_limit, len(scores))):
             best_id = max(scores, key=scores.get)
@@ -108,8 +107,9 @@ class RetrieveConversationPipeline:
         result = []
         for ranked_chunk in ranked_chunks:
             result.append({
-                "uuid" : ranked_chunk.uuid,
+                "id" : ranked_chunk.uuid,
                 "conversation_id" : ranked_chunk.properties["conversation_id"],
+                "title" : ranked_chunk.properties["title"],
                 "messages" : [
                     {
                         "role" : ranked_chunk.properties["roles"][i],
